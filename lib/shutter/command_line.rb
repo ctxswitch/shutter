@@ -34,9 +34,9 @@ module Shutter
         opts.on( '-r', '--restore', 'Load the firewall through iptables-restore.') do
           options[:command] = :restore
         end
-        options[:persist] = false
+        @persist = false
         opts.on( '-p', '--persist', 'Make the changes persistant. (with --restore)') do
-          options[:persist] = true
+          @persist = true
         end
         options[:debug] = false
         opts.on( '-d', '--debug', 'Be a bit more chatty') do
@@ -52,8 +52,8 @@ module Shutter
         end
       end
       optparse.parse!
-      puts "* Using config path: #{@config_path}" if options[:debug]
-      puts "* Running command: #{options[:command].to_s}" if options[:debug]
+      puts "* Using config path: #{@config_path}" if @debug
+      puts "* Running command: #{options[:command].to_s}" if @debug
       send(options[:command])
     end
 
@@ -90,7 +90,7 @@ module Shutter
       IO.popen("#{Shutter::IPTables::IPTABLES_RESTORE}", "r+") do |iptr|
         iptr.puts @ipt ; iptr.close_write
       end
-      persist if options[:persist]
+      persist if @persist
     end
 
     def persist
