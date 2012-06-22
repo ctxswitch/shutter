@@ -94,7 +94,7 @@ module Shutter
     end
 
     def persist
-      pfile = ENV['SHUTTER_PERSIST_FILE'] ? ENV['SHUTTER_PERSIST_FILE'] : Shutter::IPTables.persit_file(@os)
+      pfile = ENV['SHUTTER_PERSIST_FILE'] ? ENV['SHUTTER_PERSIST_FILE'] : Shutter::IPTables.persist_file(@os)
       File.open(pfile, "w") do |f|
         f.write(@ipt)
       end
