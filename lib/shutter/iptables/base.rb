@@ -7,6 +7,10 @@ module Shutter
         @content = file.read
       end
 
+      def persist_file(os)
+        "/etc/sysconfig/iptables"
+      end
+
       def to_s
         @content
       end

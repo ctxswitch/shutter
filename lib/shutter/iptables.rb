@@ -8,9 +8,5 @@ require 'shutter/os'
 module Shutter
   module IPTables
     IPTABLES_RESTORE="/sbin/iptables-restore"
-
-    def persist_file(os)
-      "/etc/sysconfig/iptables"
-    end
   end
 end
