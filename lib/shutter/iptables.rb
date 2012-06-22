@@ -6,6 +6,6 @@ require 'shutter/iptables/port'
 
 module Shutter
 	module IPTables
-		
+		IPTABLES_RESTORE="/sbin/iptables-restore"
 	end
 end
