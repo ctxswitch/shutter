@@ -35,6 +35,10 @@ module Shutter
 				@content = @content.gsub(/#\ \[RULES:FAIL2BAN\]/, @f2b_rules)
 				@jail = Jail.new.jail_rules
 				@content = @content.gsub(/#\ \[RULES:JAIL\]/, @jail)
+
+				# Remove the rest of the comments and extra lines
+				@content = @content.gsub(/^#.*$/, "")
+				@content = @content.gsub(/^$\n/, "")				
 			end
 		end
 	end
