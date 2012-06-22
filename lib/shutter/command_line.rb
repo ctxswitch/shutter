@@ -6,7 +6,8 @@ module Shutter
   class CommandLine
     def initialize( path = "/etc/shutter.d")
       # Currently only available to RedHat variants
-      unless Shutter::OS.redhat?
+      @os = Shutter::OS.new
+      unless @os.redhat?
         puts "Shutter is currently only compatible with RedHat and its variants."
         puts "Help make it compatible with others (github.com/rlyon/shutter)"
         exit
@@ -45,7 +46,7 @@ module Shutter
           options[:command] = :restore
         end
         options[:persist] = false
-        opts.on( 'p', '--persist', 'Make the changes persistant.') do
+        opts.on( 'p', '--persist', 'Make the changes persistant. (with --restore)') do
           options[:persist] = true
         end
         options[:debug] = false
@@ -76,6 +77,13 @@ module Shutter
       @ipt = Shutter::IPTables::Base.new(@config_path).generate
       IO.popen("#{Shutter::IPTables::IPTABLES_RESTORE}", "r+") do |iptr|
         iptr.puts @ipt ; iptr.close_write
+      end
+      persist if options[:persist]
+    end
+
+    def persist
+      File.open(Shutter::IPTables.persit_file(@os), "w") do |f|
+        f.write(@ipt)
       end
     end
 
