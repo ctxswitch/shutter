@@ -3,5 +3,12 @@ require "shutter/content"
 require "shutter/command_line"
 
 module Shutter
-  # Your code goes here...
+  CONFIG_FILES = %w[
+        base.ipt
+        iface.dmz
+        ip.allow
+        ip.deny
+        ports.private
+        ports.public
+  ]
 end

@@ -14,24 +14,7 @@ module Shutter
       end
 
       @config_path = path
-      # Make sure that we have the proper files
-      files = %w[
-        base.ipt
-        iface.dmz
-        ip.allow
-        ip.deny
-        ports.private
-        ports.public
-      ]
-      files.each do |name|
-        file = "#{@config_path}/#{name}"
-        unless File.exists?(file)
-          # puts "Creating: #{file}"
-          File.open(file, 'w') do |f| 
-            f.write(Shutter.const_get(name.upcase.gsub(/\./, "_")))
-          end
-        end
-      end
+      
     end
 
     def execute
@@ -39,6 +22,12 @@ module Shutter
       optparse = OptionParser.new do |opts|
         opts.banner = "Usage: shutter [options]"
         options[:command] = :save
+        opts.on( '--init', 'Create the initial configuration files' ) do
+          options[:command] = :init
+        end
+        opts.on( '--reinit', 'Rereate the initial configuration files' ) do
+          options[:command] = :reinit
+        end
         opts.on( '-s', '--save', 'Output the firewall to stdout. (DEFAULT)') do
           options[:command] = :save
         end
@@ -46,7 +35,7 @@ module Shutter
           options[:command] = :restore
         end
         options[:persist] = false
-        opts.on( 'p', '--persist', 'Make the changes persistant. (with --restore)') do
+        opts.on( '-p', '--persist', 'Make the changes persistant. (with --restore)') do
           options[:persist] = true
         end
         options[:debug] = false
@@ -68,12 +57,35 @@ module Shutter
       send(options[:command])
     end
 
+    def init
+      Shutter::CONFIG_FILES.each do |name|
+        file = "#{@config_path}/#{name}"
+        unless File.exists?(file)
+          # puts "Creating: #{file}"
+          File.open(file, 'w') do |f| 
+            f.write(Shutter.const_get(name.upcase.gsub(/\./, "_")))
+          end
+        end
+      end
+    end
+
+    def reinit
+      Shutter::CONFIG_FILES.each do |name|
+        file = "#{@config_path}/#{name}"
+        File.open(file, 'w') do |f| 
+          f.write(Shutter.const_get(name.upcase.gsub(/\./, "_")))
+        end
+      end
+    end
+
     def save
+      init
       @ipt = Shutter::IPTables::Base.new(@config_path).generate
       puts @ipt
     end
 
     def restore
+      init
       @ipt = Shutter::IPTables::Base.new(@config_path).generate
       IO.popen("#{Shutter::IPTables::IPTABLES_RESTORE}", "r+") do |iptr|
         iptr.puts @ipt ; iptr.close_write
@@ -82,7 +94,8 @@ module Shutter
     end
 
     def persist
-      File.open(Shutter::IPTables.persit_file(@os), "w") do |f|
+      pfile = ENV['SHUTTER_PERSIST_FILE'] ? ENV['SHUTTER_PERSIST_FILE'] : Shutter::IPTables.persit_file(@os)
+      File.open(pfile, "w") do |f|
         f.write(@ipt)
       end
     end
