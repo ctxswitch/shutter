@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+begin
+	require 'rubygems'
+rescue LoadError
+end
+
+require 'shutter'
+config_path = ENV['LOCKER_CONFIG'] ? ENV['LOCKER_CONFIG'] : "/etc/shutter.d"
+Shutter::CommandLine.new(config_path).execute
