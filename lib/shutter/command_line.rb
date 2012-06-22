@@ -60,7 +60,11 @@ module Shutter
 		end
 
 		def restore
-			puts "hello from restore"
+			@ipt = Shutter::IPTables::Base.new(@config_path).generate
+			IO.popen("#{Shutter::IPTables::CMD}") do |iptr|
+				iptr.puts @ipt 
+			end
 		end
+		
 	end
 end
