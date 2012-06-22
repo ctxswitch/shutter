@@ -6,5 +6,5 @@ rescue LoadError
 end
 
 require 'shutter'
-config_path = ENV['LOCKER_CONFIG'] ? ENV['LOCKER_CONFIG'] : "/etc/shutter.d"
+config_path = ENV['SHUTTER_CONFIG'] ? ENV['SHUTTER_CONFIG'] : "/etc/shutter.d"
 Shutter::CommandLine.new(config_path).execute

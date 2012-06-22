@@ -6,6 +6,6 @@ require 'shutter/iptables/port'
 
 module Shutter
 	module IPTables
-	
+		
 	end
 end
