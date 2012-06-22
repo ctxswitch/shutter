@@ -62,8 +62,8 @@ module Shutter
 
 		def restore
 			@ipt = Shutter::IPTables::Base.new(@config_path).generate
-			IO.popen("#{Shutter::IPTables::IPTABLES_RESTORE}") do |iptr|
-				iptr.puts @ipt 
+			IO.popen("#{Shutter::IPTables::IPTABLES_RESTORE}", "r+") do |iptr|
+				iptr.puts @ipt ; iptr.close_write
 			end
 		end
 
