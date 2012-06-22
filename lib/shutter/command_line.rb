@@ -14,6 +14,7 @@ module Shutter
       end
 
       @config_path = path
+      @iptables = Shutter::IPTables::Base.new(@config_path)
       
     end
 
@@ -80,13 +81,13 @@ module Shutter
 
     def save
       init
-      @ipt = Shutter::IPTables::Base.new(@config_path).generate
+      @ipt = @iptables.generate
       puts @ipt
     end
 
     def restore
       init
-      @ipt = Shutter::IPTables::Base.new(@config_path).generate
+      @ipt = @iptables.generate
       IO.popen("#{Shutter::IPTables::IPTABLES_RESTORE}", "r+") do |iptr|
         iptr.puts @ipt ; iptr.close_write
       end
@@ -94,7 +95,7 @@ module Shutter
     end
 
     def persist
-      pfile = ENV['SHUTTER_PERSIST_FILE'] ? ENV['SHUTTER_PERSIST_FILE'] : Shutter::IPTables::persist_file(@os)
+      pfile = ENV['SHUTTER_PERSIST_FILE'] ? ENV['SHUTTER_PERSIST_FILE'] : @iptables.persist_file(@os)
       File.open(pfile, "w") do |f|
         f.write(@ipt)
       end
