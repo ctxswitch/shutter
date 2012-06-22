@@ -49,8 +49,9 @@ module Shutter
 					exit
 				end
 			end
-			optparse.parse
+			optparse.parse!
 			puts "* Using config path: #{@config_path}" if options[:debug]
+			puts "* Running command: #{options[:command].to_s}" if options[:debug]
 			send(options[:command])
 		end
 
@@ -65,6 +66,6 @@ module Shutter
 				iptr.puts @ipt 
 			end
 		end
-		
+
 	end
 end
