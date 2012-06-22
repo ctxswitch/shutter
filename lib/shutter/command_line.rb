@@ -1,9 +1,17 @@
 require 'optparse'
 require 'shutter/iptables'
+require 'shutter/os'
 
 module Shutter
   class CommandLine
     def initialize( path = "/etc/shutter.d")
+      # Currently only available to RedHat variants
+      unless Shutter::OS.redhat?
+        puts "Shutter is currently only compatible with RedHat and its variants."
+        puts "Help make it compatible with others (github.com/rlyon/shutter)"
+        exit
+      end
+
       @config_path = path
       # Make sure that we have the proper files
       files = %w[
@@ -30,11 +38,15 @@ module Shutter
       optparse = OptionParser.new do |opts|
         opts.banner = "Usage: shutter [options]"
         options[:command] = :save
-        opts.on( '-s', '--save', 'Output the firewall to stdout.') do
+        opts.on( '-s', '--save', 'Output the firewall to stdout. (DEFAULT)') do
           options[:command] = :save
         end
         opts.on( '-r', '--restore', 'Load the firewall through iptables-restore.') do
           options[:command] = :restore
+        end
+        options[:persist] = false
+        opts.on( 'p', '--persist', 'Make the changes persistant.') do
+          options[:persist] = true
         end
         options[:debug] = false
         opts.on( '-d', '--debug', 'Be a bit more chatty') do
