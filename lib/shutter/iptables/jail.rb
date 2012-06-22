@@ -16,7 +16,7 @@ module Shutter
       def jail_rules
         jail = `/sbin/iptables-save | grep "^-A Jail"`
         lines = jail.split('\n')
-        unless lines != [] && lines[-1] == "-A Jail -j RETURN\n"
+        unless lines.last =~ /-A Jail -j RETURN/
           jail += "-A Jail -j RETURN\n"
         end
         jail
