@@ -1,7 +1,9 @@
 # Shutter
 
 Shutter is a tool that enables system administrators the ability to manage 
-iptables firewall settings through simple lists instead of complex iptables commands.
+iptables firewall settings through simple lists instead of complex iptables commands.  Please note:
+This application currently only works with Red Hat based distributions, as the need arrises more 
+distributions will be added.
 
 ## Installation
 
@@ -34,6 +36,20 @@ placeholders.
 Shutter was designed to work with the Fail2ban access monitoring/management tool.  It includes a 
 special chain called 'Jail' which is used to insert the jump rules that fail2ban uses to deny access 'on-the-fly'.
 To work correctly, you configure fail2ban to use the Jail chain instead of INPUT.
+
+To check your firewall you can run:
+
+    $ shutter --save
+
+This command mimics the 'iptables-save' command which prints the rules out to the screen.  
+This does not modify the firewall settings.
+
+To implement the changes, use:
+
+    $ shutter --restore
+
+This command uses 'iptables-restore' under the hood to update the firewall.  You can use the '--persist' option
+to make the changes permanent and survive reboots.
 
 More documentation to come...
 
