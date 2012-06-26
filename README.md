@@ -22,16 +22,16 @@ Create the initial configuration files.
     $ shutter --init
 
 Modify the files to meet your required settings.  There are several files:
-* base.ipt:  The one file to rule them all.  Modifying this file is optional as
+* **base.ipt:**  The one file to rule them all.  Modifying this file is optional as
 it is the template that is used to build the firewall. If you do modify the file,
 just make sure you include the appropriate placeholder directives to allow
 shutter to dynamically fill in the rules.  It is possible to leave out any unwanted
 placeholders.
-* iface.dmz:  Enter any private interfaces that will be unprotected by the firewall.  One per line.
-* ip.allow:  A list of IP addresses and ranges that are allowed to access the 'private' ports
-* ip.deny:  A list of IP addresses and ranges that are denied access to both public and private ports. 
-* ports.private:  A list of ports and protocols that are available to traffic that passes through the AllowIP chain
-* ports.public:  A list of ports and protocols that are available publically to everyone except the 'Bastards' listed in ip.deny
+* **iface.dmz:**  Enter any private interfaces that will be unprotected by the firewall.  One per line.
+* **ip.allow:**  A list of IP addresses and ranges that are allowed to access the 'private' ports
+* **ip.deny:**  A list of IP addresses and ranges that are denied access to both public and private ports. 
+* **ports.private:**  A list of ports and protocols that are available to traffic that passes through the AllowIP chain
+* **ports.public:**  A list of ports and protocols that are available publically to everyone except the 'Bastards' listed in ip.deny
 
 Shutter was designed to work with the Fail2ban access monitoring/management tool.  It includes a 
 special chain called 'Jail' which is used to insert the jump rules that fail2ban uses to deny access 'on-the-fly'.
