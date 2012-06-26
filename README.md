@@ -13,20 +13,22 @@ Instalation is through the gem package management program.
 
 ## Usage
 
-Install the gem.
+#### Install the gem.
     
     $ gem install shutter
 
-Create the initial configuration files.
+#### Create the initial configuration files.
 
     $ shutter --init
 
-Modify the files to meet your required settings.  There are several files:
+#### Modify the files to meet your required settings.  
+
+There are several files that you can modify:
 * **base.ipt:**  The one file to rule them all.  Modifying this file is optional as
 it is the template that is used to build the firewall. If you do modify the file,
 just make sure you include the appropriate placeholder directives to allow
 shutter to dynamically fill in the rules.  It is possible to leave out any unwanted
-placeholders.
+placeholders.  By default the files are will be found in the */etc/shutter.d* directory
 * **iface.dmz:**  Enter any private interfaces that will be unprotected by the firewall.  One per line.
 * **ip.allow:**  A list of IP addresses and ranges that are allowed to access the 'private' ports
 * **ip.deny:**  A list of IP addresses and ranges that are denied access to both public and private ports. 
@@ -37,19 +39,23 @@ Shutter was designed to work with the Fail2ban access monitoring/management tool
 special chain called 'Jail' which is used to insert the jump rules that fail2ban uses to deny access 'on-the-fly'.
 To work correctly, you configure fail2ban to use the Jail chain instead of INPUT.
 
-To check your firewall you can run:
+#### To check your firewall you can run:
 
     $ shutter --save
 
 This command mimics the 'iptables-save' command which prints the rules out to the screen.  
 This does not modify the firewall settings.
 
-To implement the changes, use:
+#### To implement the changes, use:
 
     $ shutter --restore
 
 This command uses 'iptables-restore' under the hood to update the firewall.  You can use the '--persist' option
 to make the changes permanent and survive reboots.
+
+#### Useful environment variables:
+**SHUTTER_CONFIG:** Use this variable to set the location to the configuration files.
+**SHUTTER_PERSIST_FILE** Use this variable to set the location of the 'persist' file.  i.e. /etc/sysconfig/iptables (default for Redhat)
 
 More documentation to come...
 
