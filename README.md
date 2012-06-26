@@ -56,7 +56,7 @@ to make the changes permanent and survive reboots.
 #### Useful environment variables:
 **SHUTTER_CONFIG:** Use this variable to set the location to the configuration files.
 
-**SHUTTER_PERSIST_FILE** Use this variable to set the location of the 'persist' file.  i.e. /etc/sysconfig/iptables (default for Redhat)
+**SHUTTER_PERSIST_FILE:** Use this variable to set the location of the 'persist' file.  i.e. /etc/sysconfig/iptables (default for Redhat)
 
 More documentation to come...
 
