@@ -58,6 +58,8 @@ to make the changes permanent and survive reboots.
 
 **SHUTTER_PERSIST_FILE:** Use this variable to set the location of the 'persist' file.  i.e. /etc/sysconfig/iptables (default for Redhat)
 
+**SHUTTER_MODE:** Sets the mode of operation.  Currently only used for testing, but in the future it will include a development mode for increased log output for automated runs
+
 More documentation to come...
 
 
