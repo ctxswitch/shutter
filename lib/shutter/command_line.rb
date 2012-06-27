@@ -5,20 +5,21 @@ require 'shutter/os'
 module Shutter
   class CommandLine
     def initialize( path = "/etc/shutter.d")
-      # Currently only available to RedHat variants
-      @os = Shutter::OS.new
-      unless @os.redhat?
-        puts "Shutter is currently only compatible with RedHat and its variants."
-        puts "Help make it compatible with others (github.com/rlyon/shutter)"
-        exit
+      # Currently only available to RedHat variants uless testing
+      unless ENV['SHUTTER_MODE'] == "testing"
+        @os = Shutter::OS.new
+        unless @os.redhat?
+          puts "Shutter is currently only compatible with RedHat and its variants."
+          puts "Help make it compatible with others (github.com/rlyon/shutter)"
+          exit
+        end
       end
 
       @config_path = path
-      @iptables = Shutter::IPTables::Base.new(@config_path)
-      
     end
 
     def execute
+      @iptables = Shutter::IPTables::Base.new(@config_path)
       options = {}
       optparse = OptionParser.new do |opts|
         opts.banner = "Usage: shutter [options]"
@@ -59,6 +60,7 @@ module Shutter
     end
 
     def init
+      create_config_dir
       Shutter::CONFIG_FILES.each do |name|
         file = "#{@config_path}/#{name}"
         unless File.exists?(file)
@@ -71,6 +73,7 @@ module Shutter
     end
 
     def reinit
+      create_config_dir
       Shutter::CONFIG_FILES.each do |name|
         file = "#{@config_path}/#{name}"
         File.open(file, 'w') do |f| 
@@ -98,6 +101,18 @@ module Shutter
       pfile = ENV['SHUTTER_PERSIST_FILE'] ? ENV['SHUTTER_PERSIST_FILE'] : @iptables.persist_file(@os)
       File.open(pfile, "w") do |f|
         f.write(@ipt)
+      end
+    end
+
+    private
+    def create_config_dir
+      # Check to see if the path to the config files exist
+      unless File.directory?(@config_path)
+        begin
+          Dir.mkdir(@config_path)
+        rescue Errno::ENOENT
+          raise "Could not create the configuration directory.  Check to see if the parent directory exists."
+        end
       end
     end
 
