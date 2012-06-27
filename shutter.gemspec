@@ -4,8 +4,13 @@ require File.expand_path('../lib/shutter/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Rob Lyon"]
   gem.email         = ["nosignsoflifehere@gmail.com"]
-  gem.description   = %q{Shutter helps maintain firewalls}
-  gem.summary       = %q{Shutter helps maintain firewalls}
+  gem.description   = %q{Shutter is a tool that gives system administrators the ability 
+                         to manage iptables firewall settings through simple lists instead 
+                         of complex iptables rules. Please note: This application currently 
+                         only works with Red Hat based distributions, as the need arrises 
+                         more distributions will be added.
+                        }
+  gem.summary       = %q{Shutter helps manage iptables firewalls}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
