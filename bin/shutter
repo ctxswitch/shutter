@@ -7,4 +7,5 @@ end
 
 require 'shutter'
 config_path = ENV['SHUTTER_CONFIG'] ? ENV['SHUTTER_CONFIG'] : "/etc/shutter.d"
+ENV['SHUTTER_MODE'] = "production"
 Shutter::CommandLine.new(config_path).execute
