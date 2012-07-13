@@ -18,8 +18,11 @@ module Shutter
       @config_path = path
     end
 
+    def iptables
+      @iptables ||= Shutter::IPTables::Base.new(@config_path)
+    end
+
     def execute
-      @iptables = Shutter::IPTables::Base.new(@config_path)
       options = {}
       optparse = OptionParser.new do |opts|
         opts.banner = "Usage: shutter [options]"
@@ -84,13 +87,13 @@ module Shutter
 
     def save
       init
-      @ipt = @iptables.generate
+      @ipt = iptables.generate
       puts @ipt
     end
 
     def restore
       init
-      @ipt = @iptables.generate
+      @ipt = iptables.generate
       IO.popen("#{Shutter::IPTables::IPTABLES_RESTORE}", "r+") do |iptr|
         iptr.puts @ipt ; iptr.close_write
       end
@@ -98,7 +101,7 @@ module Shutter
     end
 
     def persist
-      pfile = ENV['SHUTTER_PERSIST_FILE'] ? ENV['SHUTTER_PERSIST_FILE'] : @iptables.persist_file(@os)
+      pfile = ENV['SHUTTER_PERSIST_FILE'] ? ENV['SHUTTER_PERSIST_FILE'] : iptables.persist_file(@os)
       File.open(pfile, "w") do |f|
         f.write(@ipt)
       end
