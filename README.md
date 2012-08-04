@@ -1,7 +1,8 @@
 # Shutter
 
-Shutter is a tool that enables system administrators the ability to manage 
-iptables firewall settings through simple lists instead of complex iptables commands.  Please note:
+Shutter is a tool that gives system administrators the ability to manage 
+iptables firewall settings through simple lists instead of complex iptables commands, making it
+easier to define host and service firewall setting with configuration management tools.  Please note:
 This application currently only works with Red Hat based distributions, as the need arrises more 
 distributions will be added.
 
