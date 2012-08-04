@@ -37,8 +37,11 @@ placeholders.  By default the files are will be found in the */etc/shutter.d* di
 * **ports.public:**  A list of ports and protocols that are available publically to everyone except the 'Bastards' listed in ip.deny
 
 Shutter was designed to work with the Fail2ban access monitoring/management tool.  It includes a 
-special chain called 'Jail' which is used to insert the jump rules that fail2ban uses to deny access 'on-the-fly'.
-To work correctly, you configure fail2ban to use the Jail chain instead of INPUT.
+special chain called 'Jail' which is used to insert the jump rules that fail2ban uses to deny 
+access 'on-the-fly'.  To work correctly, you configure fail2ban to use the Jail chain instead of 
+INPUT.  The dynamic rules that fail2ban has created in the jail chain remain persistant when 
+shutter is 'restored' or reloaded.
+
 
 #### To check your firewall you can run:
 
