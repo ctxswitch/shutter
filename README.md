@@ -6,7 +6,7 @@ easier to define host and service firewall setting with configuration management
 This application currently only works with Red Hat based distributions, as the need arises more 
 distributions will be added.  
 
-**Note: Shutter server is not yet complete**
+** Note: Shutter server is not yet complete**
 
 ## Installation
 
@@ -19,6 +19,8 @@ Instalation is through the gem package management program.
 Version 0.0.7 adds forwarding capabilities to shutter.  To upgrade the base template and add the new configuration files, use the following command:
 
     $ shutter --upgrade
+
+** Note: I didn't realize that there was a maximum prefix length for iptables logging before I packaged the gem.  If you are installing from the gem, you will need to make a small change to the base.ipt file.  Change the log prefix for the FORWARD chain to something less than 29 characters.  It will be fixed the next time I push 0.0.8 to rubygems. (it's fixed in the master branch) **
 
 ## Usage
 
