@@ -14,7 +14,6 @@ module Shutter
           exit
         end
       end
-
       @config_path = path
     end
 
@@ -32,6 +31,9 @@ module Shutter
         end
         opts.on( '--reinit', 'Rereate the initial configuration files' ) do
           options[:command] = :reinit
+        end
+        opts.on( '--upgrade', 'Rereate the base template to add new features' ) do
+          options[:command] = :upgrade
         end
         opts.on( '-s', '--save', 'Output the firewall to stdout. (DEFAULT)') do
           options[:command] = :save
@@ -78,6 +80,16 @@ module Shutter
     def reinit
       create_config_dir
       Shutter::CONFIG_FILES.each do |name|
+        file = "#{@config_path}/#{name}"
+        File.open(file, 'w') do |f| 
+          f.write(Shutter.const_get(name.upcase.gsub(/\./, "_")))
+        end
+      end
+    end
+
+    def upgrade
+      create_config_dir
+      ["base.ipt", "iface.forward"].each do |name|
         file = "#{@config_path}/#{name}"
         File.open(file, 'w') do |f| 
           f.write(Shutter.const_get(name.upcase.gsub(/\./, "_")))

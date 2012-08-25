@@ -3,6 +3,7 @@ require 'shutter/iptables/eyepee'
 require 'shutter/iptables/iface'
 require 'shutter/iptables/jail'
 require 'shutter/iptables/port'
+require 'shutter/iptables/forward'
 require 'shutter/os'
 
 module Shutter

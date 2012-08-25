@@ -6,6 +6,7 @@ module Shutter
   CONFIG_FILES = %w[
         base.ipt
         iface.dmz
+        iface.forward
         ip.allow
         ip.deny
         ports.private

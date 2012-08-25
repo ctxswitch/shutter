@@ -3,14 +3,22 @@
 Shutter is a tool that gives system administrators the ability to manage 
 iptables firewall settings through simple lists instead of complex iptables commands, making it
 easier to define host and service firewall setting with configuration management tools.  Please note:
-This application currently only works with Red Hat based distributions, as the need arrises more 
-distributions will be added.
+This application currently only works with Red Hat based distributions, as the need arises more 
+distributions will be added.  
+
+**Note: Shutter server is not yet complete**
 
 ## Installation
 
 Instalation is through the gem package management program. 
 
     $ gem install shutter
+
+## Upgrading from 0.0.6 to 0.0.7
+
+Version 0.0.7 adds forwarding capabilities to shutter.  To upgrade the base template and add the new configuration files, use the following command:
+
+    $ shutter --upgrade
 
 ## Usage
 
@@ -42,17 +50,55 @@ access 'on-the-fly'.  To work correctly, you configure fail2ban to use the Jail 
 INPUT.  The dynamic rules that fail2ban has created in the jail chain remain persistant when 
 shutter is 'restored' or reloaded.
 
+Shutter can also run as a server to recieve requests from clients to populate the ip.allow and ip.deny files from a central location.  To use this feature, you will need to generate an encryption key on the system you plan on using as the server by running the command:
+    
+    server $ shutter --keygen
+
+This will create the file validation.pem in the /etc/shutter.d (or the user defined) folder.  The validation key can then be distributed to the shutter clients to pull in lists.  On the shutter server, you will need to define the available lists in the server.json configuration file.  It could look like this:
+    
+    {
+      'allow_lists': [
+        'default.allow',
+        'private.allow',
+        'public.allow'
+      ],
+      'deny_lists': [
+        'default.deny',
+        'bastards.deny'
+      ]
+    }
+
+To start the server run:
+
+    server $ shutter --server start
+
+To stop the server run:
+
+    server $ shutter --server stop
+
+To restart the server run:
+
+    server $ shutter --server restart
+
+The first time you run shutter-server, empty files will be created in /etc/shutter.d/lists.  Edit the files just like you would the ip.allow and ip.deny files.  Make sure you copy the validation.pem file to your client and then on the client run:
+
+    client $ shutter --allow private --remote shutter.example.com
+
+If the '--allow' is not specified it will grab default.allow file and if the file does not exist on the server it will return an error.  In this case, shutter will grab the private.allow file from the remote site and replace ip.allow with the contents if the contents have changed.
+
+Under the hood:  A request is sent out to retrieve the MD5 sum of the file that lives on the server, if the md5sum of the file on the remote server is different than the one that is on the local server, the file is retrieved and updated on the client.
+
 
 #### To check your firewall you can run:
 
-    $ shutter --save
+    client $ shutter --save
 
 This command mimics the 'iptables-save' command which prints the rules out to the screen.  
 This does not modify the firewall settings.
 
 #### To implement the changes, use:
 
-    $ shutter --restore
+    client $ shutter --restore
 
 This command uses 'iptables-restore' under the hood to update the firewall.  You can use the '--persist' option
 to make the changes permanent and survive reboots.
