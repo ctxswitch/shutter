@@ -1,11 +1,17 @@
+if ENV['COVERAGE'] == "true"
+  require 'simplecov'
+  FILTER_DIRS = ['spec']
+ 
+  SimpleCov.start do
+    FILTER_DIRS.each{ |f| add_filter f }
+  end
+end
+
 require 'rubygems'
 require 'bundler/setup'
+require 'mocha_standalone'
 require 'shutter'
 
 RSpec.configure do |config|
   config.mock_with :mocha
 end
-
-ENV['SHUTTER_CONFIG'] = "./tmp"
-ENV['SHUTTER_PERSIST_FILE'] = "./tmp/iptables"
-ENV['SHUTTER_MODE'] = "testing"

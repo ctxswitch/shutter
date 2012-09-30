@@ -4,8 +4,14 @@ begin
 	require 'rubygems'
 rescue LoadError
 end
-
 require 'shutter'
-config_path = ENV['SHUTTER_CONFIG'] || "/etc/shutter.d"
-ENV['SHUTTER_MODE'] = ENV['SHUTTER_MODE'] || "production"
-Shutter::CommandLine.new(config_path).execute
+
+os = Shutter::OS.new
+os.validate!
+SHUTTER_PERSIST_FILE = os.persist_file
+
+#TODO: Should make these not constant
+IPTABLES_RESTORE="/sbin/iptables-restore"
+IPTABLES_SAVE="/sbin/iptables-save"
+
+Shutter::CommandLine.new.execute(ARGV)

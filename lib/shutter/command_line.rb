@@ -1,135 +1,114 @@
 require 'optparse'
-require 'shutter/iptables'
-require 'shutter/os'
 
 module Shutter
   class CommandLine
+    DISPLAY_OPTS_INIT     = %q{Create the initial configuration files.}
+    DISPLAY_OPTS_REINIT   = %q{Rereate the initial configuration files.}
+    DISPLAY_OPTS_UPGRADE  = %q{Upgrade the configuration files that have changes with a new version.}
+    DISPLAY_OPTS_DIR      = %q{Set the directory for configuration files.  Default is /etc/shutter.d.}
+    DISPLAY_OPTS_SAVE     = %q{Output the firewall to stdout. This is the default behavior.}
+    DISPLAY_OPTS_RESTORE  = %q{Restore the firewall through iptables-restore.}
+    DISPLAY_OPTS_PERSIST  = %q{Write the firewall to the persistance file.  If an argument is given, it will be used as the persistance file}
+    DISPLAY_OPTS_DEBUG    = %q{Turn on debugging for extra output.}
+    DISPLAY_OPTS_HELP     = %q{Display help and exit.}
+    DISPLAY_OPTS_VERSION  = %q{Display version and exit.}
+
     def initialize( path = "/etc/shutter.d")
-      # Currently only available to RedHat variants uless testing
-      unless ENV['SHUTTER_MODE'] == "testing"
-        @os = Shutter::OS.new
-        unless @os.redhat?
-          puts "Shutter is currently only compatible with RedHat and its variants."
-          puts "Help make it compatible with others (github.com/rlyon/shutter)"
-          exit
-        end
-      end
       @config_path = path
-    end
-
-    def iptables
-      @iptables ||= Shutter::IPTables::Base.new(@config_path)
-    end
-
-    def execute
-      options = {}
-      optparse = OptionParser.new do |opts|
-        opts.banner = "Usage: shutter [options]"
-        options[:command] = :save
-        opts.on( '--init', 'Create the initial configuration files' ) do
-          options[:command] = :init
-        end
-        opts.on( '--reinit', 'Rereate the initial configuration files' ) do
-          options[:command] = :reinit
-        end
-        opts.on( '--upgrade', 'Rereate the base template to add new features' ) do
-          options[:command] = :upgrade
-        end
-        opts.on( '-s', '--save', 'Output the firewall to stdout. (DEFAULT)') do
-          options[:command] = :save
-        end
-        opts.on( '-r', '--restore', 'Load the firewall through iptables-restore.') do
-          options[:command] = :restore
-        end
-        @persist = false
-        opts.on( '-p', '--persist', 'Make the changes persistant. (with --restore)') do
-          @persist = true
-        end
-        options[:debug] = false
-        opts.on( '-d', '--debug', 'Be a bit more chatty') do
-          options[:debug] = true
-        end
-        opts.on_tail( '-h', '--help', 'Display this screen' ) do
-          puts opts
-          exit
-        end
-        opts.on_tail( '--version', "Show the version") do
-          puts Shutter::VERSION
-          exit
-        end
-      end
-      optparse.parse!
-      puts "* Using config path: #{@config_path}" if @debug
-      puts "* Running command: #{options[:command].to_s}" if @debug
-      send(options[:command])
-    end
-
-    def init
-      create_config_dir
-      Shutter::CONFIG_FILES.each do |name|
-        file = "#{@config_path}/#{name}"
-        unless File.exists?(file)
-          # puts "Creating: #{file}"
-          File.open(file, 'w') do |f| 
-            f.write(Shutter.const_get(name.upcase.gsub(/\./, "_")))
-          end
-        end
-      end
-    end
-
-    def reinit
-      create_config_dir
-      Shutter::CONFIG_FILES.each do |name|
-        file = "#{@config_path}/#{name}"
-        File.open(file, 'w') do |f| 
-          f.write(Shutter.const_get(name.upcase.gsub(/\./, "_")))
-        end
-      end
-    end
-
-    def upgrade
-      create_config_dir
-      ["base.ipt", "iface.forward"].each do |name|
-        file = "#{@config_path}/#{name}"
-        File.open(file, 'w') do |f| 
-          f.write(Shutter.const_get(name.upcase.gsub(/\./, "_")))
-        end
-      end
-    end
-
-    def save
-      init
-      @ipt = iptables.generate
-      puts @ipt
-    end
-
-    def restore
-      init
-      @ipt = iptables.generate
-      IO.popen("#{Shutter::IPTables::IPTABLES_RESTORE}", "r+") do |iptr|
-        iptr.puts @ipt ; iptr.close_write
-      end
-      persist if @persist
+      @os = Shutter::OS.new
     end
 
     def persist
-      pfile = ENV['SHUTTER_PERSIST_FILE'] ? ENV['SHUTTER_PERSIST_FILE'] : iptables.persist_file(@os)
-      File.open(pfile, "w") do |f|
-        f.write(@ipt)
-      end
+      @persist ||= false
     end
 
-    private
-    def create_config_dir
-      # Check to see if the path to the config files exist
-      unless File.directory?(@config_path)
-        begin
-          Dir.mkdir(@config_path)
-        rescue Errno::ENOENT
-          raise "Could not create the configuration directory.  Check to see if the parent directory exists."
+    def persist_file
+      @persist_file ||= @os.persist_file
+    end
+
+    def command
+      @command ||= :save
+    end
+
+    def debug
+      @debug ||= false
+    end
+
+    def config_path
+      @config_path ||= "/etc/shutter.d"
+    end
+
+    def firewall
+      @firewall ||= Shutter::IPTables.new(@config_path)
+    end
+
+    def execute(args, noop=false)
+      options = {}
+      optparse = OptionParser.new do |opts|
+        opts.banner = "Usage: shutter [options]"
+        # Initialize the configuration files
+        opts.on( '--init', DISPLAY_OPTS_INIT ) do
+          @command = :init
+        end
+        # Recreate the configuration files.  Overwrites all changes
+        opts.on( '--reinit', DISPLAY_OPTS_REINIT ) do 
+          @command = :reinit
+        end
+        # Upgrade the configuration files that have changes with a new version
+        opts.on( '--upgrade', DISPLAY_OPTS_UPGRADE ) do 
+          @command = :upgrade
+        end
+        # Output the firewall to stdout
+        opts.on( '-s', '--save', DISPLAY_OPTS_SAVE) do
+          @command = :save
+        end
+        # Restore the firewall through iptables-restore
+        opts.on( '-r', '--restore', DISPLAY_OPTS_RESTORE) do
+          @command = :restore
+        end
+        # Write the firewall to the persistance file
+        opts.on( '-p', "--persist [FILE]", DISPLAY_OPTS_PERSIST) do |file| 
+          @persist = true
+          @persist_file = file || persist_file
+        end
+        # Sets the directory for configuration files
+        opts.on( '-d', '--dir DIR', DISPLAY_OPTS_DIR) do |dir| 
+          @config_path = dir
+        end
+        # Turn on debugging
+        opts.on_tail( '--debug', DISPLAY_OPTS_DEBUG) do 
+          @debug = true
+        end
+        # Display help and exit
+        opts.on_tail( '-h', '--help', DISPLAY_OPTS_HELP ) do 
+          puts opts ; exit
+        end
+        # Display version and exit
+        opts.on_tail( '--version', DISPLAY_OPTS_VERSION) do
+          puts Shutter::VERSION ; exit
         end
       end
+      optparse.parse!(args)
+      puts "* Using config path: #{@config_path}" if @debug
+      puts "* Running command: #{options[:command].to_s}" if @debug
+      Shutter::Files.create_config_dir(@config_path) unless noop
+      run unless noop
     end
 
+    def run
+      case @command
+      when :init
+        Shutter::Files.create(@config_path)
+      when :reinit
+        Shutter::Files.create(@config_path,true)
+      when :upgrade
+        Shutter::Files.create(@config_path,false,["base.ipt", "iface.forward"])
+      when :save
+        firewall.save
+      when :restore
+        firewall.restore
+        firewall.persist(@persist_file) if @persist
+      end
+    end
   end
 end

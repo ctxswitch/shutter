@@ -1,16 +1,78 @@
 require File.dirname(__FILE__) + '/spec_helper'
-require 'fileutils'
 
 describe "Shutter::CommandLine" do
-  it "should create the configuration directory if it does not exist" do
-    cmd = Shutter::CommandLine.new('./tmp/configs')
-    cmd.init
-    File.directory?('./tmp/configs').should == true
-    FileUtils.rm_rf('./tmp/configs')
+  before(:each) do
+    @cmd = Shutter::CommandLine.new("./tmp")
   end
 
-  it "should not recursively create the configuration directory if the parent does not exist" do
-    cmd = Shutter::CommandLine.new('./tmp/configs/this')
-    expect { cmd.init }.to raise_error
+  it "should set default value of persist to false" do
+    @cmd.persist.should == false
   end
+
+  it "should set default value of debug to false" do
+    @cmd.debug.should == false
+  end
+
+  it "should have set config_path to ./tmp" do
+    @cmd.config_path.should == "./tmp"
+  end
+
+  it "should set the command to :save" do
+    @cmd.execute(["--save"],true)
+    @cmd.command.should == :save
+    @cmd.execute(["-s"],true)
+    @cmd.command.should == :save
+  end
+
+  it "should set the command to :restore" do
+    @cmd.execute(["--restore"],true)
+    @cmd.command.should == :restore
+    @cmd.execute(["--restore", "--persist"],true)
+    @cmd.command.should == :restore
+    @cmd.persist.should == true
+  end
+
+  it "should set the command to :init" do
+    @cmd.execute(["--init"],true)
+    @cmd.command.should == :init
+  end
+
+  it "should set the command to :reinit" do
+    @cmd.execute(["--reinit"],true)
+    @cmd.command.should == :reinit
+  end
+
+  it "should set the command to :upgrade" do
+    @cmd.execute(["--upgrade"],true)
+    @cmd.command.should == :upgrade
+  end
+
+  it "should set the config path and persist" do
+    Shutter::OS.stubs(:version).returns("Unknown")
+    @cmd.execute(["--dir", "/tmp", "--restore", "--persist"],true)
+    @cmd.command.should == :restore
+    @cmd.persist.should == true
+    @cmd.persist_file.should == "/tmp/iptables.rules"
+    @cmd.config_path.should == "/tmp"
+    @cmd.execute(["-d", "/tmp", "--restore", "--persist"],true)
+    @cmd.command.should == :restore
+    @cmd.persist.should == true
+    @cmd.persist_file.should == "/tmp/iptables.rules"
+    @cmd.config_path.should == "/tmp"
+  end
+
+  it "should set the config path and persist with file" do
+    Shutter::OS.stubs(:version).returns("Unknown")
+    @cmd.execute(["--dir", "/tmp", "--restore", "--persist", "/tmp/persistance.file"],true)
+    @cmd.command.should == :restore
+    @cmd.persist.should == true
+    @cmd.persist_file.should == "/tmp/persistance.file"
+    @cmd.config_path.should == "/tmp"
+    @cmd.execute(["-d", "/tmp", "--restore", "--persist", "/tmp/persistance.file"],true)
+    @cmd.command.should == :restore
+    @cmd.persist.should == true
+    @cmd.persist_file.should == "/tmp/persistance.file"
+    @cmd.config_path.should == "/tmp"
+  end
+
 end
