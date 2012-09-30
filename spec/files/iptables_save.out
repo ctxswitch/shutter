@@ -55,10 +55,7 @@
 -A DropJail -j DROP 
 -A DropScan ! -d 0.0.0.255/0.0.0.255 -m limit --limit 3/min -j LOG --log-prefix "iptables: Scan detected:" 
 -A DropScan -j DROP 
--A Jail -p tcp -m tcp --dport 22 -j fail2ban-SSH 
--A Jail -p tcp -m tcp --dport 22 -j fail2ban-SSH 
--A Jail -p tcp -m tcp --dport 22 -j fail2ban-SSH 
--A Jail -p tcp -m tcp --dport 22 -j fail2ban-SSH 
+-A Jail -p tcp -m tcp --dport 22 -j fail2ban-SSH
 -A Jail -j RETURN 
 -A Private -p tcp -m state --state NEW -m tcp --dport 22 -j RETURN 
 -A Private ! -d 0.0.0.255/0.0.0.255 -m limit --limit 3/min -j LOG --log-prefix "iptables: Unauthorized:" 
@@ -84,9 +81,6 @@
 -A ValidCheck -p tcp -m tcp ! --dport 2049 -m multiport --sports 20,21,22,23,80,110,143,443,993,995 -j DropDDOS 
 -A ValidCheck -p udp -m udp ! --dport 2049 -m multiport --sports 20,21,22,23,80,110,143,443,993,995 -j DropDDOS 
 -A ValidCheck -j RETURN 
--A fail2ban-SSH -j RETURN 
--A fail2ban-SSH -j RETURN 
--A fail2ban-SSH -j RETURN 
--A fail2ban-SSH -j RETURN 
+-A fail2ban-SSH -j RETURN
 COMMIT
 # Completed on Sat Sep 29 14:34:04 2012

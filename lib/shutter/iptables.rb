@@ -14,40 +14,47 @@ module Shutter
 
       def initialize(path)
         @path = path
-        @base_ipt = read("base.ipt")
+        @base = read("base.ipt",false).join("\n")
         @iface_forward = read("iface.forward")
         @ports_private = read("ports.private")
         @ports_public = read("ports.public")
         @ip_allow = read("ip.allow")
         @ip_deny = read("ip.deny")
+        @dmz_device = read("iface.dmz")
         @os = Shutter::OS.new
       end
 
       def base_sub(block,content)
-        @base = @base.gsub(/#{Regex.quote(block)}/, content)
+        @base = @base.gsub(/#{Regexp.quote(block)}/, content)
       end
 
       def generate
-        self.base_sub(RULES_DMZ_BLOCK,          self.dmz_device_block)
-        self.base_sub(RULES_FORWARD_BLOCK,      self.forward_block)
-        self.base_sub(RULES_POSTROUTING_BLOCK,  self.postrouting_block)
-        self.base_sub(RULES_BASTARDS_BLOCK,     self.deny_ip_block)
-        self.base_sub(RULES_PUBLIC_BLOCK,       self.allow_public_port_block)
-        self.base_sub(RULES_ALLOWIP_BLOCK,      self.allow_ip_block)
-        self.base_sub(RULES_PRIVATE_BLOCK,      self.allow_private_port_block)
-        self.base_sub(RULES_FAIL2BAN_BLOCK,     self.fail2ban_rules_block)
-        self.base_sub(RULES_JAIL_BLOCK,         self.jail_rules_block)
-        self.base_sub(CHAINS_FAIL2BAN_BLOCK,    self.fail2ban_chains_block)
+        base_sub(RULES_DMZ_BLOCK,          dmz_device_block)
+        base_sub(RULES_FORWARD_BLOCK,      forward_block)
+        base_sub(RULES_POSTROUTING_BLOCK,  postrouting_block)
+        base_sub(RULES_BASTARDS_BLOCK,     deny_ip_block)
+        base_sub(RULES_PUBLIC_BLOCK,       allow_public_port_block)
+        base_sub(RULES_ALLOWIP_BLOCK,      allow_ip_block)
+        base_sub(RULES_PRIVATE_BLOCK,      allow_private_port_block)
+        base_sub(RULES_FAIL2BAN_BLOCK,     fail2ban_rules_block)
+        base_sub(RULES_JAIL_BLOCK,         jail_rules_block)
+        base_sub(CHAIN_FAIL2BAN_BLOCK,     fail2ban_chains_block)
+        clean
+      end
+
+      def to_s
+        @base
       end
 
       def clean
-        @base = @content.gsub(/^#.*$/, "")
-        @base = @content.gsub(/^$\n/, "") 
+        @base = @base.gsub(/^#.*$/, "")
+        @base = @base.gsub(/^$\n/, "") 
       end
 
-      def read(file)
+      def read(file, filter=true)
+        #puts "Reading: #{@path}/#{file}"
         lines = File.read("#{@path}/#{file}").split("\n")
-        lines.keep_if{ |line| line =~ /^[a-z].+$/ }
+        lines.keep_if{ |line| line =~ /^[a-z0-9].+$/ } if filter
         lines.map { |line| line.strip }
       end
 
@@ -158,8 +165,8 @@ module Shutter
 
       def jail_rules_block
         lines = iptables_save.scan(/^-A Jail.*$/)
-        jail += "-A Jail -j RETURN\n" unless lines.last =~ /-A Jail -j RETURN/
-        jail
+        lines << "-A Jail -j RETURN\n" unless lines.last =~ /-A Jail -j RETURN/
+        lines.join("\n")
       end   
 
       ###

@@ -7,7 +7,7 @@ end
 require 'shutter'
 
 os = Shutter::OS.new
-os.validate!
+#os.validate!
 SHUTTER_PERSIST_FILE = os.persist_file
 
 #TODO: Should make these not constant

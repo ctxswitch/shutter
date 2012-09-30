@@ -3,9 +3,10 @@ module Shutter
     include Shutter::Content
     
     class << self
+      include Shutter::Content
       def create(dir, overwrite=false, except=[])
         CONFIG_FILES.each do |name|
-          file = "#{@config_path}/#{name}"
+          file = "#{dir}/#{name}"
           if !File.exists?(file) || overwrite || except.include?(name)
             File.open(file, 'w') do |f| 
               f.write(const_get(name.upcase.gsub(/\./, "_")))

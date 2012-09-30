@@ -90,7 +90,7 @@ module Shutter
       end
       optparse.parse!(args)
       puts "* Using config path: #{@config_path}" if @debug
-      puts "* Running command: #{options[:command].to_s}" if @debug
+      puts "* Running command: #{@command}" if @debug
       Shutter::Files.create_config_dir(@config_path) unless noop
       run unless noop
     end
@@ -98,16 +98,16 @@ module Shutter
     def run
       case @command
       when :init
-        Shutter::Files.create(@config_path)
+        Shutter::Files.create(config_path)
       when :reinit
-        Shutter::Files.create(@config_path,true)
+        Shutter::Files.create(config_path,true)
       when :upgrade
-        Shutter::Files.create(@config_path,false,["base.ipt", "iface.forward"])
+        Shutter::Files.create(config_path,false,["base.ipt", "iface.forward"])
       when :save
         firewall.save
       when :restore
         firewall.restore
-        firewall.persist(@persist_file) if @persist
+        firewall.persist(persist_file) if persist
       end
     end
   end
