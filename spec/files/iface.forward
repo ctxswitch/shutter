@@ -1,0 +1,3 @@
+# src iface | dst iface
+eth0 eth1
+eth0 eth2
