@@ -7,7 +7,7 @@ module Shutter
     end
 
     def validate!
-      unless redhat?
+      if unknown?
         puts "Shutter is currently only compatible with RedHat and its variants."
         puts "Help make it compatible with others (github.com/rlyon/shutter)"
         raise "ERROR: Unsupported version"
@@ -24,6 +24,14 @@ module Shutter
 
     def linux?
       family == "linux"
+    end
+
+    def iptables_save
+      "/sbin/iptables-save"
+    end
+
+    def iptables_restore
+      "/sbin/iptables-restore"
     end
 
     def persist_file
@@ -54,6 +62,18 @@ module Shutter
 
     def redhat?
       dist == "RedHat"
+    end
+
+    def ubuntu?
+      dist == "Ubuntu"
+    end
+
+    def debian?
+      dist == "Debian"
+    end
+
+    def unknown?
+      dist == "Unknown"
     end
 
     alias :centos? :redhat? 
