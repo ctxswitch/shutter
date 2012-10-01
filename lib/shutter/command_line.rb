@@ -13,6 +13,8 @@ module Shutter
     DISPLAY_OPTS_HELP     = %q{Display help and exit.}
     DISPLAY_OPTS_VERSION  = %q{Display version and exit.}
 
+    attr_reader :os
+
     def initialize( path = "/etc/shutter.d")
       @config_path = path
       @os = Shutter::OS.new

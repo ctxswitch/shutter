@@ -59,31 +59,31 @@ describe "Shutter::CommandLine" do
   end
 
   it "should set the config path and persist" do
-    Shutter::OS.stubs(:version).returns("Unknown")
-    @cmd.execute(["--dir", "/tmp", "--restore", "--persist"],true)
+    @cmd.os.stubs(:version).returns("Unknown")
+    @cmd.execute(["--dir", "./tmp", "--restore", "--persist"],true)
     @cmd.command.should == :restore
     @cmd.persist.should == true
     @cmd.persist_file.should == "/tmp/iptables.rules"
-    @cmd.config_path.should == "/tmp"
-    @cmd.execute(["-d", "/tmp", "--restore", "--persist"],true)
+    @cmd.config_path.should == "./tmp"
+    @cmd.execute(["-d", "./tmp", "--restore", "--persist"],true)
     @cmd.command.should == :restore
     @cmd.persist.should == true
     @cmd.persist_file.should == "/tmp/iptables.rules"
-    @cmd.config_path.should == "/tmp"
+    @cmd.config_path.should == "./tmp"
   end
 
   it "should set the config path and persist with file" do
-    Shutter::OS.stubs(:version).returns("Unknown")
-    @cmd.execute(["--dir", "/tmp", "--restore", "--persist", "/tmp/persistance.file"],true)
+    @cmd.os.stubs(:version).returns("Unknown")
+    @cmd.execute(["--dir", "./tmp", "--restore", "--persist", "./tmp/persistance.file"],true)
     @cmd.command.should == :restore
     @cmd.persist.should == true
-    @cmd.persist_file.should == "/tmp/persistance.file"
-    @cmd.config_path.should == "/tmp"
-    @cmd.execute(["-d", "/tmp", "--restore", "--persist", "/tmp/persistance.file"],true)
+    @cmd.persist_file.should == "./tmp/persistance.file"
+    @cmd.config_path.should == "./tmp"
+    @cmd.execute(["-d", "./tmp", "--restore", "--persist", "./tmp/persistance.file"],true)
     @cmd.command.should == :restore
     @cmd.persist.should == true
-    @cmd.persist_file.should == "/tmp/persistance.file"
-    @cmd.config_path.should == "/tmp"
+    @cmd.persist_file.should == "./tmp/persistance.file"
+    @cmd.config_path.should == "./tmp"
   end
 
 end
