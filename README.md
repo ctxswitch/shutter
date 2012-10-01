@@ -6,8 +6,6 @@ easier to define host and service firewall setting with configuration management
 This application is currently only tested with Red Hat based distributions.  Ubuntu and Debian should 
 work but are not supported.
 
-** Note: Shutter server is not yet complete**
-
 ## Installation
 
 Instalation is through the gem package management program. 
@@ -70,17 +68,17 @@ to make the changes permanent and survive reboots.  Persist can optionally take 
 persist file if it is in a non-standard location.
 
 #### Command line options
-Usage: shutter [options]
-        --init                       Create the initial configuration files.
-        --reinit                     Rereate the initial configuration files.
-        --upgrade                    Upgrade the configuration files that have changes with a new version.
-    -s, --save                       Output the firewall to stdout. This is the default behavior.
-    -r, --restore                    Restore the firewall through iptables-restore.
-    -p, --persist [FILE]             Write the firewall to the persistance file.  If an argument is given, it will be used as the persistance file
-    -d, --dir DIR                    Set the directory for configuration files.  Default is /etc/shutter.d.
-        --debug                      Turn on debugging for extra output.
-    -h, --help                       Display help and exit.
-        --version                    Display version and exit.
+    Usage: shutter [options]
+            --init                       Create the initial configuration files.
+            --reinit                     Rereate the initial configuration files.
+            --upgrade                    Upgrade the configuration files that have changes with a new version.
+        -s, --save                       Output the firewall to stdout. This is the default behavior.
+        -r, --restore                    Restore the firewall through iptables-restore.
+        -p, --persist [FILE]             Write the firewall to the persistance file.  If an argument is given, it will be used as the persistance file
+        -d, --dir DIR                    Set the directory for configuration files.  Default is /etc/shutter.d.
+            --debug                      Turn on debugging for extra output.
+        -h, --help                       Display help and exit.
+            --version                    Display version and exit.
 
 More documentation to come...
 
