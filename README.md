@@ -1,5 +1,7 @@
 # Shutter
 
+[![Build Status](https://secure.travis-ci.org/rlyon/shutter.png)](http://travis-ci.org/rlyon/shutter)
+
 Shutter is a tool that gives system administrators the ability to manage 
 iptables firewall settings through simple lists instead of complex iptables commands, making it
 easier to define host and service firewall setting with configuration management tools.  Please note:
