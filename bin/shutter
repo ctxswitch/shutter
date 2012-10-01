@@ -7,11 +7,11 @@ end
 require 'shutter'
 
 os = Shutter::OS.new
-#os.validate!
+os.validate!
 SHUTTER_PERSIST_FILE = os.persist_file
 
 #TODO: Should make these not constant
-IPTABLES_RESTORE="/sbin/iptables-restore"
-IPTABLES_SAVE="/sbin/iptables-save"
+#IPTABLES_RESTORE="/sbin/iptables-restore"
+#IPTABLES_SAVE="/sbin/iptables-save"
 
 Shutter::CommandLine.new.execute(ARGV)
