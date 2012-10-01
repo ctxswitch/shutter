@@ -8,9 +8,7 @@ module Shutter
 
     def validate!
       if unknown?
-        puts "Shutter is currently only compatible with RedHat and its variants."
-        puts "Help make it compatible with others (github.com/rlyon/shutter)"
-        raise "ERROR: Unsupported version"
+        raise "ERROR: Unsupported operating system"
       end
     end
 
