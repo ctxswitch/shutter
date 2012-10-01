@@ -2,6 +2,16 @@ require File.dirname(__FILE__) + '/spec_helper'
 require 'fileutils'
 
 describe "Shutter::Files" do
+  before(:each) do
+    FileUtils.mkdir("./tmp")
+    @cmd = Shutter::CommandLine.new("./tmp")
+  end
+
+  after(:each) do
+    FileUtils.rm Dir.glob('./tmp/*')
+    FileUtils.rmdir("./tmp")
+  end
+
   it "should create the configuration directory if it does not exist" do
     Shutter::Files.create_config_dir('./tmp/configs')
     File.directory?('./tmp/configs').should == true

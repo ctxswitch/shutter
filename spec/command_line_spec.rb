@@ -2,7 +2,14 @@ require File.dirname(__FILE__) + '/spec_helper'
 
 describe "Shutter::CommandLine" do
   before(:each) do
+    FileUtils.mkdir("./tmp")
+    Shutter::Files.create("./tmp")
     @cmd = Shutter::CommandLine.new("./tmp")
+  end
+
+  after(:each) do
+    FileUtils.rm Dir.glob('./tmp/*')
+    FileUtils.rmdir("./tmp")
   end
 
   it "should not raise exception when firewall is called" do
