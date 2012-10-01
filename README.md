@@ -3,8 +3,8 @@
 Shutter is a tool that gives system administrators the ability to manage 
 iptables firewall settings through simple lists instead of complex iptables commands, making it
 easier to define host and service firewall setting with configuration management tools.  Please note:
-This application currently only works with Red Hat based distributions, as the need arises more 
-distributions will be added.  
+This application is currently only tested with Red Hat based distributions.  Ubuntu and Debian should 
+work but are not supported.
 
 ** Note: Shutter server is not yet complete**
 
@@ -14,13 +14,13 @@ Instalation is through the gem package management program.
 
     $ gem install shutter
 
-## Upgrading from 0.0.6 to 0.0.7
+## Upgrading from <= 0.0.7 to 0.1.0
 
-Version 0.0.7 adds forwarding capabilities to shutter.  To upgrade the base template and add the new configuration files, use the following command:
+Version 0.0.7 added forwarding capabilities to shutter so the base.ipt changed and needs to be upgraded.  Version 0.1.0 was a complete rewrite which fixed multiple
+bugs as well as the problem with the maximum prefix length for iptables logging in base.ipt.  Support for ubuntu and debian was added but not tested well and 
+requires the iptables-persistant package.  To upgrade the base template and add the new configuration files, use the following command:
 
     $ shutter --upgrade
-
-** Note: I didn't realize that there was a maximum prefix length for iptables logging before I packaged the gem.  If you are installing from the gem, you will need to make a small change to the base.ipt file.  Change the log prefix for the FORWARD chain to something less than 29 characters.  It will be fixed the next time I push 0.0.8 to rubygems. (it's fixed in the master branch) **
 
 ## Usage
 
@@ -28,7 +28,8 @@ Version 0.0.7 adds forwarding capabilities to shutter.  To upgrade the base temp
     
     $ gem install shutter
 
-#### Create the initial configuration files.
+#### OPTIONAL: Create the initial configuration files.
+Shutter automatically creates any missing configuration files anytime it is run, but you can create them prior to 
 
     $ shutter --init
 
@@ -41,6 +42,7 @@ just make sure you include the appropriate placeholder directives to allow
 shutter to dynamically fill in the rules.  It is possible to leave out any unwanted
 placeholders.  By default the files are will be found in the */etc/shutter.d* directory
 * **iface.dmz:**  Enter any private interfaces that will be unprotected by the firewall.  One per line.
+* **iface.forward:**  Enter any source and destination interfaces that forwarding will occur.
 * **ip.allow:**  A list of IP addresses and ranges that are allowed to access the 'private' ports
 * **ip.deny:**  A list of IP addresses and ranges that are denied access to both public and private ports. 
 * **ports.private:**  A list of ports and protocols that are available to traffic that passes through the AllowIP chain
@@ -52,65 +54,33 @@ access 'on-the-fly'.  To work correctly, you configure fail2ban to use the Jail 
 INPUT.  The dynamic rules that fail2ban has created in the jail chain remain persistant when 
 shutter is 'restored' or reloaded.
 
-Shutter can also run as a server to recieve requests from clients to populate the ip.allow and ip.deny files from a central location.  To use this feature, you will need to generate an encryption key on the system you plan on using as the server by running the command:
-    
-    server $ shutter --keygen
-
-This will create the file validation.pem in the /etc/shutter.d (or the user defined) folder.  The validation key can then be distributed to the shutter clients to pull in lists.  On the shutter server, you will need to define the available lists in the server.json configuration file.  It could look like this:
-    
-    {
-      'allow_lists': [
-        'default.allow',
-        'private.allow',
-        'public.allow'
-      ],
-      'deny_lists': [
-        'default.deny',
-        'bastards.deny'
-      ]
-    }
-
-To start the server run:
-
-    server $ shutter --server start
-
-To stop the server run:
-
-    server $ shutter --server stop
-
-To restart the server run:
-
-    server $ shutter --server restart
-
-The first time you run shutter-server, empty files will be created in /etc/shutter.d/lists.  Edit the files just like you would the ip.allow and ip.deny files.  Make sure you copy the validation.pem file to your client and then on the client run:
-
-    client $ shutter --allow private --remote shutter.example.com
-
-If the '--allow' is not specified it will grab default.allow file and if the file does not exist on the server it will return an error.  In this case, shutter will grab the private.allow file from the remote site and replace ip.allow with the contents if the contents have changed.
-
-Under the hood:  A request is sent out to retrieve the MD5 sum of the file that lives on the server, if the md5sum of the file on the remote server is different than the one that is on the local server, the file is retrieved and updated on the client.
-
-
 #### To check your firewall you can run:
 
-    client $ shutter --save
+    $ shutter --save
 
 This command mimics the 'iptables-save' command which prints the rules out to the screen.  
 This does not modify the firewall settings.
 
 #### To implement the changes, use:
 
-    client $ shutter --restore
+    $ shutter --restore
 
 This command uses 'iptables-restore' under the hood to update the firewall.  You can use the '--persist' option
-to make the changes permanent and survive reboots.
+to make the changes permanent and survive reboots.  Persist can optionally take an argument which defines the location of the
+persist file if it is in a non-standard location.
 
-#### Useful environment variables:
-**SHUTTER_CONFIG:** Use this variable to set the location to the configuration files.
-
-**SHUTTER_PERSIST_FILE:** Use this variable to set the location of the 'persist' file.  i.e. /etc/sysconfig/iptables (default for Redhat)
-
-**SHUTTER_MODE:** Sets the mode of operation.  Currently only used for testing, but in the future it will include a development mode for increased log output for automated runs
+#### Command line options
+Usage: shutter [options]
+        --init                       Create the initial configuration files.
+        --reinit                     Rereate the initial configuration files.
+        --upgrade                    Upgrade the configuration files that have changes with a new version.
+    -s, --save                       Output the firewall to stdout. This is the default behavior.
+    -r, --restore                    Restore the firewall through iptables-restore.
+    -p, --persist [FILE]             Write the firewall to the persistance file.  If an argument is given, it will be used as the persistance file
+    -d, --dir DIR                    Set the directory for configuration files.  Default is /etc/shutter.d.
+        --debug                      Turn on debugging for extra output.
+    -h, --help                       Display help and exit.
+        --version                    Display version and exit.
 
 More documentation to come...
 
