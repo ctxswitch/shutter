@@ -24,7 +24,7 @@ describe "Shutter::Files" do
 
   it "should include the templates for all files" do
     Shutter::Files::CONFIG_FILES.each do |name|
-      Shutter::Files.constants.include?(:"#{name.upcase.gsub(/\./, "_")}").should == true
+      Shutter::Files.const_defined?(:"#{name.upcase.gsub(/\./, "_")}").should == true
     end
   end
 
