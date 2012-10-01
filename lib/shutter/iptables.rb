@@ -54,8 +54,19 @@ module Shutter
       def read(file, filter=true)
         #puts "Reading: #{@path}/#{file}"
         lines = File.read("#{@path}/#{file}").split("\n")
-        lines.keep_if{ |line| line =~ /^[a-z0-9].+$/ } if filter
-        lines.map { |line| line.strip }
+        # Doesn't work with 1.8.x
+        # lines.keep_if{ |line| line =~ /^[a-z0-9].+$/ } if filter
+        # so since we are iterating through this, well handle the stripping as well
+        # lines.map { |line| line.strip }
+        newlines = []
+        lines.each do |line|
+          if filter
+            newlines << line.strip if line =~ /^[a-z0-9].+$/
+          else
+            newlines << line.strip
+          end
+        end
+        newlines
       end
 
       def save
@@ -63,14 +74,14 @@ module Shutter
       end
 
       def restore
-        IO.popen("#{iptable_restore}", "r+") do |iptr|
+        IO.popen("#{iptables_restore}", "r+") do |iptr|
           iptr.puts self.generate ; iptr.close_write
         end
       end
 
       def persist(pfile)
         File.open(pfile, "w") do |f|
-          f.write(@ipt)
+          f.write(@base)
         end
       end
 
@@ -78,11 +89,11 @@ module Shutter
       ### IPTables Commands
       ###
       def iptables_save
-        @iptable_save ||= `#{IPTABLES_SAVE}`
+        @iptable_save ||= `"#{@os.iptables_save}"`
       end
 
       def iptables_restore
-        #{IPTABLES_RESTORE}
+        "#{@os.iptables_restore}"
       end
 
       ###
