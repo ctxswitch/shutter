@@ -39,7 +39,7 @@ module Shutter
     end
 
     def firewall
-      @firewall ||= Shutter::IPTables.new(@config_path)
+      @firewall ||= Shutter::Firewall::IPTables.new(@config_path)
     end
 
     def execute(args, noop=false)
@@ -91,7 +91,9 @@ module Shutter
       optparse.parse!(args)
       puts "* Using config path: #{@config_path}" if @debug
       puts "* Running command: #{@command}" if @debug
-      Shutter::Files.create_config_dir(@config_path) unless noop
+      puts "* Using persistance file: #{persist_file}" if @debug && persist
+      Shutter::Files.create_config_dir(config_path) unless noop
+      Shutter::Files.create(config_path)
       run unless noop
     end
 
@@ -107,6 +109,7 @@ module Shutter
         firewall.save
       when :restore
         firewall.restore
+        puts "Writing to #{persist_file}" if persist
         firewall.persist(persist_file) if persist
       end
     end
