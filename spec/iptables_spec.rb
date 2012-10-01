@@ -6,6 +6,10 @@ describe "Shutter::Firewall::IPTables" do
     @ipt = Shutter::Firewall::IPTables.new("./spec/files")
   end
 
+  it "should have the default iptables-restore defined" do
+    @ipt.iptables_restore.should == "/sbin/iptables-restore"
+  end
+
   it "should return the correct forward block" do
     @ipt.forward_block.should == %q{-A FORWARD -i eth0 -o eth1 -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT
 -A FORWARD -i eth1 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT

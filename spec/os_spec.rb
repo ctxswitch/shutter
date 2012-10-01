@@ -45,9 +45,9 @@ describe "Shutter::OS" do
     @os.stubs(:version).returns("Unknown")
     expect { @os.validate! }.to raise_error
     @os.stubs(:version).returns("Ubuntu")
-    expect { @os.validate! }.to raise_error
+    expect { @os.validate! }.to_not raise_error
     @os.stubs(:version).returns("Debian")
-    expect { @os.validate! }.to raise_error
+    expect { @os.validate! }.to_not raise_error
     @os.stubs(:version).returns("Red Hat")
     expect { @os.validate! }.to_not raise_error
   end

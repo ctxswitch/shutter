@@ -5,6 +5,10 @@ describe "Shutter::CommandLine" do
     @cmd = Shutter::CommandLine.new("./tmp")
   end
 
+  it "should not raise exception when firewall is called" do
+    expect { @cmd.firewall }.to_not raise_error
+  end
+
   it "should set default value of persist to false" do
     @cmd.persist.should == false
   end

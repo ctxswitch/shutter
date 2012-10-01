@@ -17,4 +17,60 @@ describe "Shutter::Files" do
       Shutter::Files.constants.include?(:"#{name.upcase.gsub(/\./, "_")}").should == true
     end
   end
+
+  it "should create the files in the configuration directory if they do not exist" do
+    Shutter::Files.create_config_dir('./spec/tmp')
+    Shutter::Files.create('./spec/tmp')
+    Shutter::Files::CONFIG_FILES.each do |name|
+      File.exists?("./spec/tmp/#{name}")
+      File.read("./spec/tmp/#{name}").should == Shutter::Files.const_get(:"#{name.upcase.gsub(/\./, "_")}")
+    end
+    FileUtils.rm_rf('./spec/tmp')
+  end
+
+  it "should not touch the configs when they already exist" do
+    Shutter::Files.create_config_dir('./spec/tmp')
+    Shutter::Files::CONFIG_FILES.each do |name|
+      FileUtils.copy("./spec/files/#{name}", "./spec/tmp/#{name}")
+    end
+    Shutter::Files.create('./spec/tmp')
+    Shutter::Files::CONFIG_FILES.each do |name|
+      File.exists?("./spec/tmp/#{name}")
+      unless name == "base.ipt"
+        File.read("./spec/tmp/#{name}").should_not == Shutter::Files.const_get(:"#{name.upcase.gsub(/\./, "_")}")
+      end
+    end
+    FileUtils.rm_rf('./spec/tmp')
+  end
+
+  it "should overwrite the configs when overwrite is specified" do
+    Shutter::Files.create_config_dir('./spec/tmp')
+    Shutter::Files::CONFIG_FILES.each do |name|
+      FileUtils.copy("./spec/files/#{name}", "./spec/tmp/#{name}")
+    end
+    Shutter::Files.create('./spec/tmp',true)
+    Shutter::Files::CONFIG_FILES.each do |name|
+      File.exists?("./spec/tmp/#{name}")
+      File.read("./spec/tmp/#{name}").should == Shutter::Files.const_get(:"#{name.upcase.gsub(/\./, "_")}")
+    end
+    FileUtils.rm_rf('./spec/tmp')
+  end
+
+  it "should overwrite the configs when overwrite false but there are exceptions" do
+    Shutter::Files.create_config_dir('./spec/tmp')
+    Shutter::Files::CONFIG_FILES.each do |name|
+      FileUtils.copy("./spec/files/#{name}", "./spec/tmp/#{name}")
+    end
+    except = ['iface.forward','base.ipt']
+    Shutter::Files.create('./spec/tmp',false,except)
+    Shutter::Files::CONFIG_FILES.each do |name|
+      File.exists?("./spec/tmp/#{name}")
+      unless except.include?(name)
+        File.read("./spec/tmp/#{name}").should_not == Shutter::Files.const_get(:"#{name.upcase.gsub(/\./, "_")}")
+      else
+        File.read("./spec/tmp/#{name}").should == Shutter::Files.const_get(:"#{name.upcase.gsub(/\./, "_")}")
+      end
+    end
+    FileUtils.rm_rf('./spec/tmp')
+  end
 end
