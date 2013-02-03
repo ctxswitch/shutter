@@ -53,6 +53,18 @@ describe "Shutter::Firewall::IPTables" do
 }
   end
 
+  it "should return true if generated rules and iptables-save rules match" do
+    iptables_save = File.read("./spec/files/iptables_save_bare.out")
+    @ipt.stubs(:iptables_save).returns(iptables_save)
+    @ipt.check.should == true
+  end
+
+  it "should return false if generated rules and iptables-save rules don't match" do
+    iptables_save = File.read("./spec/files/iptables_save_extrarules.out")
+    @ipt.stubs(:iptables_save).returns(iptables_save)
+    @ipt.check.should == false
+  end
+
   it "should return the correct output for generate" do
     iptables_save = File.read("./spec/files/iptables_save.out")
     @ipt.stubs(:iptables_save).returns(iptables_save)

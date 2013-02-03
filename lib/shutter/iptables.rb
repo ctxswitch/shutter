@@ -97,6 +97,16 @@ module Shutter
       end
 
       ###
+      ### Check to see if base and iptables-save content match
+      ###
+      def check
+        gen_rules = filter_and_sort(generate)
+        ips_rules = filter_and_sort(iptables_save)
+        extra_rules = ips_rules - gen_rules
+        extra_rules.empty?
+      end
+
+      ###
       ### Block Generation
       ###
       def forward_block
@@ -211,6 +221,17 @@ module Shutter
 
       def dmz_device_content(iface)
         "-A Dmz -i #{iface} -j ACCEPT\n"
+      end
+
+      private
+      ###
+      ### Filter and sort iptables-save for checking
+      ###
+      def filter_and_sort(content)
+        filtered = content.scan(/^[:-].*$/).sort
+        # Make sure that we remove (gsub) the counts on the chains and remove any
+        # trailing whitespace and newlines
+        filtered.map {|x| x.gsub(/\ \[.*\]/,"").strip}
       end
 
     end

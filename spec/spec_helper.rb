@@ -9,7 +9,7 @@ end
 
 require 'rubygems'
 require 'bundler/setup'
-require 'mocha_standalone'
+require 'mocha/api'
 require 'shutter'
 
 RSpec.configure do |config|

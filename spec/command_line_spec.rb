@@ -43,6 +43,13 @@ describe "Shutter::CommandLine" do
     @cmd.persist.should == true
   end
 
+  it "should set the command to :check" do
+    @cmd.execute(["--check"],true)
+    @cmd.command.should == :check
+    @cmd.execute(["-c"],true)
+    @cmd.command.should == :check
+  end
+
   it "should set the command to :init" do
     @cmd.execute(["--init"],true)
     @cmd.command.should == :init

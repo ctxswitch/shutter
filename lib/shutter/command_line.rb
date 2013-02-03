@@ -6,9 +6,10 @@ module Shutter
     DISPLAY_OPTS_REINIT   = %q{Rereate the initial configuration files.}
     DISPLAY_OPTS_UPGRADE  = %q{Upgrade the configuration files that have changes with a new version.}
     DISPLAY_OPTS_DIR      = %q{Set the directory for configuration files.  Default is /etc/shutter.d.}
-    DISPLAY_OPTS_SAVE     = %q{Output the firewall to stdout. This is the default behavior.}
-    DISPLAY_OPTS_RESTORE  = %q{Restore the firewall through iptables-restore.}
-    DISPLAY_OPTS_PERSIST  = %q{Write the firewall to the persistance file.  If an argument is given, it will be used as the persistance file}
+    DISPLAY_OPTS_SAVE     = %q{Output the firewall rules to stdout. This is the default behavior.}
+    DISPLAY_OPTS_RESTORE  = %q{Restore the firewall rules through iptables-restore.}
+    DISPLAY_OPTS_PERSIST  = %q{Write the firewall to the persistance file.  If an argument is given, it will be used as the persistance file.}
+    DISPLAY_OPTS_CHECK    = %q{Check to see if the generated rules match the current firewall rules.}
     DISPLAY_OPTS_DEBUG    = %q{Turn on debugging for extra output.}
     DISPLAY_OPTS_HELP     = %q{Display help and exit.}
     DISPLAY_OPTS_VERSION  = %q{Display version and exit.}
@@ -72,6 +73,10 @@ module Shutter
         opts.on( '-p', "--persist [FILE]", DISPLAY_OPTS_PERSIST) do |file| 
           @persist = true
           @persist_file = file || persist_file
+        end
+        # Check the generated rules against the current rules
+        opts.on( '-c', "--check", DISPLAY_OPTS_PERSIST) do |file| 
+          @command = :check
         end
         # Sets the directory for configuration files
         opts.on( '-d', '--dir DIR', DISPLAY_OPTS_DIR) do |dir| 
