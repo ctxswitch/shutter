@@ -118,6 +118,12 @@ module Shutter
         firewall.restore
         puts "Writing to #{persist_file}" if persist
         firewall.persist(persist_file) if persist
+      when :check
+        if firewall.check
+          puts "OK"
+        else
+          puts "MISMATCH"
+        end
       end
     end
   end
