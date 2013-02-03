@@ -14,11 +14,9 @@ Instalation is through the gem package management program.
 
     $ gem install shutter
 
-## Upgrading from <= 0.0.7 to 0.1.0
+## Upgrading from older versions
 
-Version 0.0.7 added forwarding capabilities to shutter so the base.ipt changed and needs to be upgraded.  Version 0.1.0 was a complete rewrite which fixed multiple
-bugs as well as the problem with the maximum prefix length for iptables logging in base.ipt.  Support for ubuntu and debian was added but not tested well and 
-requires the iptables-persistant package.  To upgrade the base template and add the new configuration files, use the following command:
+The base template will sometimes change with new versions to correct errors and add features.  To upgrade the base template and add any new configuration files that the new version may require, use the following command:
 
     $ shutter --upgrade
 
@@ -74,7 +72,7 @@ persist file if it is in a non-standard location.
 
     $ shutter --check
 
-The command will generate 'OK' if the rules and chains match and 'MISMATCH' if there is any variance.
+The command will return 'OK' if the rules and chains match and 'MISMATCH' if there is any variance.
 
 #### Command line options
     Usage: shutter [options]
