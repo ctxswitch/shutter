@@ -233,7 +233,7 @@ module Shutter
         filtered = content.scan(/^[:-].*$/).sort
         # Make sure that we remove (gsub) the counts on the chains and remove any
         # trailing whitespace and newlines
-        filtered.map {|x| x.gsub(/\ \[.*\]/,"").strip}
+        filtered.map {|x| x.gsub(/\ \[.*\]/,"").split(' ').sort.join.strip}
       end
 
     end
