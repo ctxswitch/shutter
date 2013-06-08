@@ -4,6 +4,7 @@
 .config
 .yardoc
 .rvmrc
+.ruby-version
 Gemfile.lock
 InstalledFiles
 _yardoc
@@ -16,3 +17,4 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
+vendor

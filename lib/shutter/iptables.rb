@@ -48,7 +48,9 @@ module Shutter
 
       def clean
         @base = @base.gsub(/^#.*$/, "")
-        @base = @base.gsub(/^$\n/, "") 
+        @base = @base.gsub(/^$\n/, "")
+        # Add a newline at the end
+        @base + "\n"
       end
 
       def read(file, filter=true)
