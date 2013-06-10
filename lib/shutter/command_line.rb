@@ -111,7 +111,7 @@ module Shutter
       when :reinit
         Shutter::Files.create(config_path,true)
       when :upgrade
-        Shutter::Files.create(config_path,false,["base.ipt", "iface.forward"])
+        Shutter::Files.create(config_path,false,["base.ipt"])
       when :save
         firewall.save
       when :restore
