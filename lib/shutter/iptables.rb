@@ -50,7 +50,7 @@ module Shutter
         @base = @base.gsub(/^#.*$/, "")
         @base = @base.gsub(/^$\n/, "")
         # Add a newline at the end
-        @base + "\n\n"
+        @base += "\n"
       end
 
       def read(file, filter=true)
@@ -75,7 +75,8 @@ module Shutter
         puts self.generate
       end
 
-      def restore
+      def restore(persist = false)
+        rules = self.generate
         IO.popen("#{iptables_restore}", "r+") do |iptr|
           iptr.puts self.generate ; iptr.close_write
         end
