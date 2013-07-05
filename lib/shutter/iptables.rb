@@ -50,7 +50,7 @@ module Shutter
         @base = @base.gsub(/^#.*$/, "")
         @base = @base.gsub(/^$\n/, "")
         # Add a newline at the end
-        @base + "\n"
+        @base + "\n\n"
       end
 
       def read(file, filter=true)
